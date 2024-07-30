@@ -94,6 +94,34 @@
         }
 
     </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertsList = document.getElementById('alerts-list');
+
+        function fetchAlerts() {
+            fetch('{% url "get_alerts" %}')
+                .then(response => response.json())
+                .then(data => {
+                    alertsList.innerHTML = '';
+                    if (data.alerts.length === 0) {
+                        alertsList.innerHTML = '<li>No alerts yet.</li>';
+                    } else {
+                        data.alerts.forEach(alert => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `<p>Detected at: ${alert.detected_at} in ${alert.location}</p>`;
+                            alertsList.appendChild(listItem);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching alerts:', error));
+        }
+        fetchAlerts();
+        setInterval(fetchAlerts, 5000);
+    });
+
+    
+</script>
 </head>
 <body>
 
@@ -107,57 +135,43 @@
             <div class="live-feeds">
                 <div class="row">
                     <div class="camera">
-                        <h3>Camera - Pole 1</h3>
+                        <h5>Camera 1 - {{ location_name }}</h5>
                         <img src="{% url 'video_feed' %}" alt="Camera 1" style="width: 100%;">
                     </div>
-                    <div class="camera">
+                    <!-- <div class="camera">
                         <h3>Camera 2</h3>
                         <img src="{% static 'images/1.png' %}" alt="Camera 2" style="width: 100%;">
-                    </div>
+                    </div> -->
                 </div>
-                <div class="row">
-                    <div class="camera">
-                        <h3>Camera 3</h3>
-                        <img src="{% static 'images/1.png' %}" alt="Camera 3" style="width: 100%;">
-                    </div>
-                    <div class="camera">
-                        <h3>Camera 4</h3>
-                        <img src="{% static 'images/1.png' %}" alt="Camera 4" style="width: 100%;">
-                    </div>
-                </div>
+                
             </div>
         </div>
         <div class="col-md-6">
                 <div class="activities">
                     <h3>Recent Activities</h3>
-                    <ul id="activities-list">
-                        <div>
-                            <h2>Detection Data</h2>
-                            <p>Trash Items Detected: {{ trash_count }}</p>
-                            <p>Processing Time: {{ processing_time }} ms</p>
-                            <p>Last Trash Detection Time: {{ trash_detection_time }}</p>
-                        </div>
+                    <ul id="alerts-list">
+                        {% for alert in alerts %}
+                            <li>
+                                <p>Detected at: {{ alert.detected_at }} in {{ alert.location }}</p>
+                            </li>
+                        {% empty %}
+                            <li>No alerts yet.</li>
+                        {% endfor %}
                     </ul>
                 </div>
             
                 <div class="reports">
                     <h3>Incident Reports</h3>
                     <ul>
+                        {% for alert in alerts %}
                         <li>
-                            <strong>Camera Location:</strong> Central Park<br>
-                            <strong>Timestamp:</strong> 2024-10-06 13:55<br>
-                            <button class="button">View Details</button>
+                            <strong>Camera Location:</strong> {{ alert.location }}<br>
+                            <strong>Timestamp:</strong> {{ alert.detected_at }}<br>
+                            <a href="{% url 'alert_detail' alert.id %}" class="btn btn-success">View Details</a>
                         </li>
-                        <li>
-                            <strong>Camera Location:</strong> Main Street<br>
-                            <strong>Timestamp:</strong> 2024-10-06 13:55<br>
-                            <button class="button">View Details</button>
-                        </li>
-                        <li>
-                            <strong>Camera Location:</strong> Main Street<br>
-                            <strong>Timestamp:</strong> 2024-10-06 13:55<br>
-                            <button class="button">View Details</button>
-                        </li>
+                        {% empty %}
+                        <li>No alerts yet.</li>
+                        {% endfor %}
                     </ul>
                 </div>
         </div>
@@ -173,5 +187,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+
 </body>
 </html>
