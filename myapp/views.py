@@ -11,7 +11,6 @@ from django.shortcuts import render, get_object_or_404
 import time
 
 
-# Load the YOLO model
 model_path = 'C:/Users/admin/Downloads/18k.pt'
 model = YOLO(model_path)
 
@@ -44,15 +43,12 @@ def generate_frames():
 
                 image_content = ContentFile(buffer.tobytes(), 'frame.jpg')
 
-                # Extract detection data
-                boxes = results[0].boxes.xyxy  # Box coordinates in [x1, y1, x2, y2]
-                confidences = results[0].boxes.conf  # Confidence scores
-                class_ids = results[0].boxes.cls  # Class IDs
+                boxes = results[0].boxes.xyxy 
+                confidences = results[0].boxes.conf 
+                class_ids = results[0].boxes.cls 
 
-                # Check for trash with class ID 1 and confidence threshold
                 trash_detected = any(cls_id == 1 and conf >= confidence_threshold for cls_id, conf in zip(class_ids, confidences))
                 
-                # Debugging information
                 print(f"Trash Detected: {trash_detected}")
 
                 if trash_detected:
@@ -99,4 +95,4 @@ def alert_detail(request, alert_id):
     alert = get_object_or_404(TrashAlert, id=alert_id)
     return render(request, 'alert_detail.html', {'alert': alert})
 
-# cap = cv2.VideoCapture('rtsp://admin:elbiWATCH2019@192.22.0.148')
+# cap = cv2.VideoCapture('rtsp://admin:sample@192.168.0.1')
