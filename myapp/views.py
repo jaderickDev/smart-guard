@@ -11,7 +11,7 @@ from django.shortcuts import render, get_object_or_404
 import time
 
 
-model_path = 'C:/Users/admin/Downloads/18k.pt'
+model_path = 'C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt'
 model = YOLO(model_path)
 
 cap = cv2.VideoCapture(0)
