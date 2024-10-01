@@ -14,8 +14,18 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 // Dashboard components
 import CameraFeed from "./components/cctvLive";
+import CameraSelection from "./components/option";
 
 function CCTV() {
+  const defaultImageSrc = "src/assets/images/ivana-squarejpg."; // Path to your default image
+
+  const handleCameraSelect = (cameraType, ipAddress) => {
+    if (cameraType === "webcam") {
+      console.log("Webcam selected");
+    } else if (cameraType === "ip") {
+      console.log("IP Camera selected with IP:", ipAddress);
+    }
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -23,7 +33,11 @@ function CCTV() {
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <h1>CCTV Monitoring System</h1>
+              <CameraSelection
+                onCameraSelect={handleCameraSelect}
+                videoSrc={videoSrc}
+                defaultImageSrc={defaultImageSrc}
+              />
               <CameraFeed />
             </Grid>
           </Grid>

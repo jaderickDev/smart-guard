@@ -18,21 +18,21 @@ import Footer from "examples/Footer";
 import TrashNotification from "./component/notif";
 
 function Notifications() {
-    <DashboardLayout>
-      <DashboardNavbar>
-        <MDBox>
+  <DashboardLayout>
+    <DashboardNavbar>
+      <MDBox>
+        <Grid>
           <Grid>
-            <Grid>
-              <Card>
-                <MDBox>
-                  <TrashNotification />
-                </MDBox>
-              </Card>
-            </Grid>
+            <Card>
+              <MDBox>
+                <TrashNotification />
+              </MDBox>
+            </Card>
           </Grid>
-        </MDBox>
-      </DashboardNavbar>
-    </DashboardLayout>
+        </Grid>
+      </MDBox>
+    </DashboardNavbar>
+  </DashboardLayout>;
 }
 
 export default Notifications;

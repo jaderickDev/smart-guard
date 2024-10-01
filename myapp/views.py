@@ -94,5 +94,5 @@ def get_alerts(request):
 def alert_detail(request, alert_id):
     alert = get_object_or_404(TrashAlert, id=alert_id)
     return render(request, 'alert_detail.html', {'alert': alert})
-
+    
 # cap = cv2.VideoCapture('rtsp://admin:sample@192.168.0.1')

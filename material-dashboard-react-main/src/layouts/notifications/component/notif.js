@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-const closeErrorSB = () => setErrorSB(false);  
+const closeErrorSB = () => setErrorSB(false);
 
 const TrashNotification = () => {
   const [alerts, setAlerts] = useState([]);

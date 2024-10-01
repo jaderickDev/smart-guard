@@ -31,16 +31,7 @@ const BillingInformation = ({ cameraIndex }) => {
         <MDTypography variant="h6" fontWeight="medium"></MDTypography>
       </MDBox>
       <MDBox pt={1} pb={2} px={2}>
-        <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          <div style={{ margin: "10px" }}>
-            <h3>Camera {cameraIndex + 1}</h3>
-            <img
-              src={`http://127.0.0.1:5000/video_feed/${cameraIndex}`}
-              alt={`Camera ${cameraIndex + 1}`}
-              style={{ width: "100%", height: "auto" }}
-            />
-          </div>
-        </MDBox>
+        <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}></MDBox>
       </MDBox>
     </Card>
   );
