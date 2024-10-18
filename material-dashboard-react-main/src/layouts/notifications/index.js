@@ -18,21 +18,22 @@ import Footer from "examples/Footer";
 import TrashNotification from "./component/notif";
 
 function Notifications() {
-  <DashboardLayout>
-    <DashboardNavbar>
-      <MDBox>
-        <Grid>
-          <Grid>
-            <Card>
-              <MDBox>
+  return (
+    <DashboardLayout>
+      <DashboardNavbar />
+      <MDBox py={3} sx={{ flexGrow: 1, height: "calc(100vh - 64px)" }}>
+        <Grid container sx={{ height: "100%" }}>
+          <Grid item xs={12} sx={{ height: "100%" }}>
+            <Card sx={{ height: "100%" }}>
+              <MDBox sx={{ height: "100%", overflow: "auto" }}>
                 <TrashNotification />
               </MDBox>
             </Card>
           </Grid>
         </Grid>
       </MDBox>
-    </DashboardNavbar>
-  </DashboardLayout>;
+    </DashboardLayout>
+  );
 }
 
 export default Notifications;

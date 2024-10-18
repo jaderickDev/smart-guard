@@ -62,6 +62,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split("/").slice(1);
   const titleMap = {
     dashboard: "CCTV Live View",
+    notifications: "Notification",
     billing: "Report Analysis",
     tables: "File Management",
     // Add other routes and their corresponding titles here

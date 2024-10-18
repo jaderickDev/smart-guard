@@ -1,38 +1,50 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Grid, Card, CardMedia, Button } from "@mui/material";
 
-const CameraFeed = ({ defaultImageSrc }) => {
-  const [isVideoAvailable, setIsVideoAvailable] = useState(true);
-
-  // Simulate video load (can be adjusted depending on real conditions)
-  useEffect(() => {
-    if (!videoSrc) {
-      setIsVideoAvailable(false);
-    }
-  }, [videoSrc]);
-
-  const handleVideoError = () => {
-    setIsVideoAvailable(false);
-  };
+function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming }) {
+  const renderCameraFeed = (camera, index) => (
+    <Grid item xs={12} sm={6} md={4} key={index}>
+      <Card>
+        <CardMedia
+          component="img"
+          height="200"
+          image={camera ? camera.streamUrl : defaultImageSrc}
+          alt={`Camera ${index + 1}`}
+          onError={onError}
+          style={{ objectFit: "cover" }}
+        />
+      </Card>
+    </Grid>
+  );
 
   return (
-    <div>
-      {isVideoAvailable ? (
-        <video src={videoSrc} onError={handleVideoError} autoPlay controls width="600" />
-      ) : (
-        <img src={defaultImageSrc} alt="Default placeholder" width="600" />
-      )}
-      <h1>Live Camera Feed</h1>
-      {/* Render the video stream */}
-      <img
-        src="http://localhost:8000/video_feed/"
-        alt="Camera Feed"
-        style={{ width: "600px", height: "auto" }}
-      />
-    </div>
+    <>
+      <Grid container spacing={2}>
+        {cameras.map((camera, index) => renderCameraFeed(camera, index))}
+      </Grid>
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={onStopStreaming}
+        style={{ marginTop: "20px" }}
+      >
+        Stop Streaming
+      </Button>
+    </>
   );
-};
-CameraFeed.propTypes = {
+}
+
+CCTVGrid.propTypes = {
+  cameras: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string.isRequired,
+      streamUrl: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   defaultImageSrc: PropTypes.string.isRequired,
+  onError: PropTypes.func.isRequired,
+  onStopStreaming: PropTypes.func.isRequired,
 };
-export default CameraFeed;
+
+export default CCTVGrid;

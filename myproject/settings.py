@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True  # For development only. Use specific origins in production.
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -135,4 +135,4 @@ os.path.join(BASE_DIR, 'material-dashboard-react-main/build/static'),
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-SESSION_ENGINE = 'django.contrib.sessions.backends.db' 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'

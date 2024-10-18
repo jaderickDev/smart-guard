@@ -1,31 +1,46 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-
-// Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
-import CameraFeed from "./components/cctvLive";
-import CameraSelection from "./components/option";
+import CameraSelection from "./components/cctvLive/cameraselection";
+import CCTVGrid from "./components/cctvLive";
 
 function CCTV() {
-  const defaultImageSrc = "src/assets/images/ivana-squarejpg."; // Path to your default image
+  const defaultImageSrc = "../assets/images/bg-profile.jpeg";
+  const [selectedCamera, setSelectedCamera] = useState(null);
+  const videoRef = useRef(null);
+  const [isStreaming, setIsStreaming] = useState(false);
 
-  const handleCameraSelect = (cameraType, ipAddress) => {
+  const handleCameraSelect = async (cameraType, streamOrUrl) => {
     if (cameraType === "webcam") {
-      console.log("Webcam selected");
+      try {
+        // For webcam, we'll use the Django backend stream
+        setSelectedCamera({
+          type: cameraType,
+          streamUrl: "http://localhost:8000/video_feed/", // Update this URL to match your Django server
+        });
+        setIsStreaming(true);
+      } catch (error) {
+        console.error("Error accessing webcam:", error);
+        alert(
+          "Failed to access webcam. Please make sure you have granted the necessary permissions."
+        );
+      }
     } else if (cameraType === "ip") {
-      console.log("IP Camera selected with IP:", ipAddress);
+      setSelectedCamera({
+        type: cameraType,
+        streamUrl: streamOrUrl,
+      });
+      setIsStreaming(true);
     }
   };
+
+  const stopStreaming = () => {
+    setSelectedCamera(null);
+    setIsStreaming(false);
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -33,12 +48,15 @@ function CCTV() {
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <CameraSelection
-                onCameraSelect={handleCameraSelect}
-                videoSrc={videoSrc}
-                defaultImageSrc={defaultImageSrc}
-              />
-              <CameraFeed />
+              <CameraSelection onCameraSelect={handleCameraSelect} />
+              {isStreaming && (
+                <CCTVGrid
+                  cameras={selectedCamera ? [selectedCamera] : []}
+                  defaultImageSrc={defaultImageSrc}
+                  onError={(error) => console.error("CCTV Stream Error:", error)}
+                  onStopStreaming={stopStreaming}
+                />
+              )}
             </Grid>
           </Grid>
         </MDBox>
