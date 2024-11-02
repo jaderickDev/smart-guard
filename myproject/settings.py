@@ -37,8 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'myapp',
     'corsheaders',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +138,4 @@ os.path.join(BASE_DIR, 'material-dashboard-react-main/build/static'),
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
