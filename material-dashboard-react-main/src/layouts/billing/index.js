@@ -6,92 +6,79 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import axios from "axios";
 import PieChart from "examples/Charts/PieChart";
-import VerticalBarChart from "examples/Charts/BarCharts/VerticalBarChart";
 import DefaultLineChart from "examples/Charts/LineCharts/DefaultLineChart";
+import { Button } from "@mui/material";
 
 function ReportAnalysis() {
   const [reports, setReports] = useState([]);
+  const [timeFrame, setTimeFrame] = useState("daily");
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get("/api/reports");
+        const response = await axios.get(`/api/reports?timeFrame=${timeFrame}`);
         setReports(response.data);
       } catch (error) {
         console.error("Error fetching reports:", error);
       }
     };
     fetchReports();
-  }, []);
-
-  // New data for incidents
-  const incidentData = {
-    labels: ["Daily", "Weekly", "Monthly"],
-    datasets: [
-      {
-        label: "Number of Incidents",
-        data: [
-          ,
-          ,/* daily incidents */
-          /* weekly incidents */
-          /* monthly incidents */
-        ],
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
-      },
-    ],
-  };
-
-  // New data for types of litter
-  const litterTypesData = {
-    labels: ["Plastic", "Paper", "Metal", "Glass"],
-    datasets: [
-      {
-        label: "Types of Litter Detected",
-        data: [
-          ,
-          ,
-          ,/* plastic count */
-          /* paper count */
-          /* metal count */
-          /* glass count */
-        ],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.6)",
-          "rgba(54, 162, 235, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
-          "rgba(75, 192, 192, 0.6)",
-        ],
-      },
-    ],
-  };
-
-  // New data for locations of incidents
-  const locationData = {
-    labels: ["Camera 1", "Camera 2"],
-    datasets: [
-      {
-        label: "Location of Incidents",
-        data: [
-          ,/* camera 1 incidents */
-          /* camera 2 incidents */
-        ],
-        backgroundColor: ["rgba(153, 102, 255, 0.6)", "rgba(255, 159, 64, 0.6)"],
-      },
-    ],
-  };
+  }, [timeFrame]);
 
   return (
     <DashboardLayout>
-      <DashboardNavbar absolute isMini />
+      <DashboardNavbar />
+      <MDBox mt={2}>
+        <MDBox mb={1}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <h1>Littering Report Analysis</h1>
+              <div>
+                <Button onClick={() => setTimeFrame("daily")}>Daily</Button>
+                <Button onClick={() => setTimeFrame("weekly")}>Weekly</Button>
+                <Button onClick={() => setTimeFrame("monthly")}>Monthly</Button>
+                <Button onClick={() => setTimeFrame("yearly")}>Yearly</Button>
+              </div>
+              <MDBox mt={2}>
+                <DefaultLineChart
+                  icon={{ color: "info", component: "leaderboard" }}
+                  title="Default Line Chart"
+                  description="Product insights"
+                  chart={{
+                    labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    datasets: [
+                      {
+                        label: "Organic Search",
+                        color: "info",
+                        data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                      },
+                      {
+                        label: "Referral",
+                        color: "dark",
+                        data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
+                      },
+                      {
+                        label: "Direct",
+                        color: "primary",
+                        data: [40, 80, 70, 90, 30, 90, 140, 130, 200],
+                      },
+                    ],
+                  }}
+                />
+              </MDBox>
+            </Grid>
+          </Grid>
+        </MDBox>
+      </MDBox>
+
       <MDBox mt={8}>
         <MDBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <h1>Littering Report Analysis</h1>
               <PieChart
                 icon={{ color: "info", component: "leaderboard" }}
                 title="Pie Chart"
-                description="Analytics Insights"
+                description="Percentage of litter in a week"
                 chart={{
                   labels: ["Facebook", "Direct", "Organic", "Referral"],
                   datasets: {
@@ -99,51 +86,6 @@ function ReportAnalysis() {
                     backgroundColors: ["info", "primary", "dark", "secondary", "primary"],
                     data: [15, 20, 12, 60],
                   },
-                }}
-              />
-            </Grid>
-          </Grid>
-        </MDBox>
-
-        {/* New section for incidents line chart */}
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <h2>Number of Incidents</h2>
-              <DefaultLineChart
-                chart={{
-                  labels: incidentData.labels,
-                  datasets: incidentData.datasets,
-                }}
-              />
-            </Grid>
-          </Grid>
-        </MDBox>
-
-        {/* New section for types of litter bar chart */}
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <h2>Types of Litter Detected</h2>
-              <VerticalBarChart
-                chart={{
-                  labels: litterTypesData.labels,
-                  datasets: litterTypesData.datasets,
-                }}
-              />
-            </Grid>
-          </Grid>
-        </MDBox>
-
-        {/* New section for locations pie chart */}
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <h2>Location of Incidents</h2>
-              <PieChart
-                chart={{
-                  labels: locationData.labels,
-                  datasets: locationData.datasets,
                 }}
               />
             </Grid>

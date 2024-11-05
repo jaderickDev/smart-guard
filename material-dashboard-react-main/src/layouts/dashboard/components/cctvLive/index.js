@@ -6,7 +6,7 @@ import axios from "axios"; // Make sure this import is present
 
 function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemoveCamera }) {
   const renderCameraFeed = (camera, index) => (
-    <Grid item xs={12} sm={6} md={4} key={index}>
+    <Grid item xs={6} sm={6} md={3} key={index}>
       <Card>
         <CardMedia
           component="img"
@@ -29,6 +29,19 @@ function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemove
         >
           <CloseIcon />
         </IconButton>
+        <Button
+          variant="outlined"
+          onClick={() => alert(`Enlarging Camera ${index + 1}`)}
+          style={{
+            position: "absolute",
+            bottom: 8,
+            left: 8,
+            color: "white",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          Enlarge
+        </Button>
       </Card>
     </Grid>
   );
@@ -45,7 +58,22 @@ function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemove
   return (
     <>
       <Grid container spacing={2}>
-        {cameras.map((camera, index) => renderCameraFeed(camera, index))}
+        {cameras.length === 0 ? (
+          <Grid item xs={12}>
+            <Card
+              style={{
+                height: "200px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <h2>NO VIDEO DISPLAY</h2>
+            </Card>
+          </Grid>
+        ) : (
+          cameras.map((camera, index) => renderCameraFeed(camera, index))
+        )}
       </Grid>
       {cameras.length > 0 && (
         <Button

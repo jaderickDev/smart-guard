@@ -23,7 +23,10 @@ function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          name: username,
+          password: password,
+        }),
       });
       if (response.ok) {
         alert("Registration successful!");
@@ -49,7 +52,7 @@ function LoginPage() {
       });
       if (response.ok) {
         alert("Login successful!");
-        // Redirect to the main dashboard or perform any other action
+        window.location.href = "/dashboard"; // Redirect to the dashboard
       } else {
         const data = await response.json();
         setError(data.error || "Login failed");
@@ -94,7 +97,7 @@ function LoginPage() {
           <input
             type="password"
             placeholder="Password"
-            value={password}SAS
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <a href="#">Forgot Your Password?</a>
