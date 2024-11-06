@@ -55,7 +55,12 @@ function LoginPage() {
         window.location.href = "/dashboard"; // Redirect to the dashboard
       } else {
         const data = await response.json();
-        setError(data.error || "Login failed");
+        // Check if the error is due to unregistered username or incorrect password
+        if (data.error) {
+          setError(data.error); // Set the error message from the response
+        } else {
+          setError("Invalid username or password"); // Fallback error message
+        }
       }
     } catch (error) {
       setError("An error occurred. Please try again.");

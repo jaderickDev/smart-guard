@@ -8,13 +8,21 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',  # Your accounts app
     ...
-]
+]   
 
-# Database configuration (example using SQLite)
-DATABASES = {
+ALLOWED_HOSTS = ["mysite.com"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+CSRF_ALLOWED_ORIGINS = ["http://localhost:3000 "]
+CORS_ORIGINS_WHITELIST = ["http://localhost:3000 "]
+# Database configuration (example using MySQL)
+DATABASES = {           
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'litter_detection',         
+        'USER': 'root',        
+        'PASSWORD': 'Jade@gen1310', 
+        'HOST': 'localhost',                  
+        'PORT': '3306', 
     }
 }
 

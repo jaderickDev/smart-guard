@@ -27,7 +27,7 @@ filepathexcel = r"C:\Users\Jaderick\Desktop\detectionalgo\runs\detect\train2\lit
 wb = load_workbook(filepathexcel)
 output_directory = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/frames"
 os.makedirs(output_directory, exist_ok=True)
-model = YOLO("C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/yolov8s.pt")
+model = YOLO("C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
 
 y = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240]
 x1 = [245, 215, 200, 180, 160, 145, 138, 122, 114, 110, 98, 80]

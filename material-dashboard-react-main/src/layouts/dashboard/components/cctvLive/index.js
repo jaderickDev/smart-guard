@@ -1,51 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Grid, Card, CardMedia, Button, IconButton } from "@mui/material";
+import { Grid, Card, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios"; // Make sure this import is present
 
-function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemoveCamera }) {
-  const renderCameraFeed = (camera, index) => (
-    <Grid item xs={6} sm={6} md={3} key={index}>
-      <Card>
-        <CardMedia
-          component="img"
-          height="200"
-          image={camera ? camera.streamUrl : defaultImageSrc}
-          alt={`Camera ${index + 1}`}
-          onError={onError}
-          style={{ objectFit: "cover" }}
-        />
-        <IconButton
-          aria-label="close"
-          onClick={() => onRemoveCamera(index)}
-          style={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: "white",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        <Button
-          variant="outlined"
-          onClick={() => alert(`Enlarging Camera ${index + 1}`)}
-          style={{
-            position: "absolute",
-            bottom: 8,
-            left: 8,
-            color: "white",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          Enlarge
-        </Button>
-      </Card>
-    </Grid>
-  );
-
+function CCTVGrid({ cameras, onError, onStopStreaming, onRemoveCamera }) {
   const handleStopStreaming = async () => {
     try {
       await axios.post("http://localhost:8000/api/stop_streaming/"); // Update this URL
@@ -53,6 +12,27 @@ function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemove
     } catch (error) {
       console.error("Error stopping stream:", error);
     }
+  };
+
+  const renderCameraFeed = (camera, index) => {
+    return (
+      <Grid item xs={12} sm={6} md={4} key={index}>
+        {camera.type === "cctv" ? (
+          <video
+            src={camera.streamUrl}
+            autoPlay
+            controls
+            style={{ width: "100%", height: "auto" }}
+          />
+        ) : (
+          <img
+            src={camera.streamUrl}
+            alt={`Webcam ${index}`}
+            style={{ width: "100%", height: "auto" }}
+          />
+        )}
+      </Grid>
+    );
   };
 
   return (
@@ -68,7 +48,7 @@ function CCTVGrid({ cameras, defaultImageSrc, onError, onStopStreaming, onRemove
                 justifyContent: "center",
               }}
             >
-              <h2>NO VIDEO DISPLAY</h2>
+              <h2 style={{ color: "red" }}>NO VIDEO DISPLAY</h2>
             </Card>
           </Grid>
         ) : (

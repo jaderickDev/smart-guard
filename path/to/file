@@ -1,8 +1,0 @@
-import time  # Add this import at the top of your file
-
-# ... existing code ...
-
-# Replace the line causing the error with:
-time.sleep(duration)  # where 'duration' is the number of seconds to sleep
-
-# ... existing code ...
