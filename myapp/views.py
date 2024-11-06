@@ -23,11 +23,11 @@ print("Loading views.py")  # Add this line
 
 # Constants and initializations
 LOCATION_NAME = "Los Banos, Philippines"
-filepathexcel = r"C:\Users\Jaderick\Desktop\detectionalgo\runs\detect\train2\litter.detect.v91.yolov8\Book1.xlsx"
+filepathexcel = "C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/litter.detect.v91.yolov8/Book1.xlsx"
 wb = load_workbook(filepathexcel)
-output_directory = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/frames"
+output_directory = "C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/frames"
 os.makedirs(output_directory, exist_ok=True)
-model = YOLO("C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
+model = YOLO("C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
 
 y = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240]
 x1 = [245, 215, 200, 180, 160, 145, 138, 122, 114, 110, 98, 80]
@@ -121,7 +121,7 @@ def generate_frames():
 
                 if trash_detected and eudlitrash < euclihuman and euclihuman != 0 and eudlitrash != 0:
                     cosineangle = (eudlitrash / euclihuman)
-                    distance_squared = (eudlitrash ** 2 + euclihuman ** 2) - (2 * eudlitrash * euclihuman) * cosineangle
+                    distance_squared = (eudlitrash * 2 + euclihuman * 2) - (2 * eudlitrash * euclihuman) * cosineangle
                     distance = math.sqrt(max(distance_squared, 0))
 
                     if distance >= 39 and current_time - last_detection_time >= detection_interval:

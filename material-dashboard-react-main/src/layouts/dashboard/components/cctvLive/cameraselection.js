@@ -30,13 +30,13 @@ function CameraSelection({ onCameraSelect }) {
   };
 
   return (
-    <Card elevation={3}>
+    <Card sx={{ maxWidth: 400, margin: "0" }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Camera Selection
         </Typography>
         <form onSubmit={handleSubmit}>
-          <FormControl fullWidth margin="normal">
+          <FormControl sx={{ width: "100%" }} margin="normal">
             <InputLabel id="camera-type-label">Camera Type</InputLabel>
             <Select
               labelId="camera-type-label"
@@ -71,13 +71,7 @@ function CameraSelection({ onCameraSelect }) {
             />
           )}
           <Box mt={2}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              startIcon={<VideocamIcon />}
-            >
+            <Button type="submit" variant="contained" color="primary" startIcon={<VideocamIcon />}>
               Connect Camera
             </Button>
           </Box>

@@ -41,12 +41,13 @@ function CCTV() {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <CameraSelection onCameraSelect={handleCameraSelect} />
-              {/* Improve the UI design of CameraSelection here */}
               {isStreaming && (
                 <CCTVGrid
                   cameras={cameras}
                   defaultImageSrc={defaultImageSrc}
-                  onError={(error) => console.error("CCTV Stream Error:", error)}
+                  onError={(error) => {
+                    console.error("CCTV Stream Error:", error);
+                  }}
                   onStopStreaming={stopStreaming}
                   onRemoveCamera={removeCamera}
                 />

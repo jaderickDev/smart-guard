@@ -1,16 +1,32 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Grid, Card, Button, IconButton } from "@mui/material";
+import { Grid, Card, Button, IconButton, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios"; // Make sure this import is present
 
 function CCTVGrid({ cameras, onError, onStopStreaming, onRemoveCamera }) {
   const handleStopStreaming = async () => {
     try {
-      await axios.post("http://localhost:8000/api/stop_streaming/"); // Update this URL
-      onStopStreaming();
+      // Send the list of camera IDs to stop
+      const cameraIds = cameras.map((camera) => camera.id);
+      await axios.post("http://localhost:8000/api/stop_streaming/", {
+        camera_ids: cameraIds,
+      });
+
+      // Stop all video elements to ensure resources are released
+      const videoElements = document.querySelectorAll("video");
+      videoElements.forEach((video) => {
+        const stream = video.srcObject;
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        video.srcObject = null;
+      });
+
+      onStopStreaming(); // Clear all cameras from state
     } catch (error) {
       console.error("Error stopping stream:", error);
+      onError(error);
     }
   };
 
@@ -19,17 +35,18 @@ function CCTVGrid({ cameras, onError, onStopStreaming, onRemoveCamera }) {
       <Grid item xs={12} sm={6} md={4} key={index}>
         {camera.type === "cctv" ? (
           <video
+            key={camera.id}
             src={camera.streamUrl}
             autoPlay
             controls
             style={{ width: "100%", height: "auto" }}
+            onError={(e) => {
+              console.error(`Error with camera ${camera.id}:`, e);
+              onError(e);
+            }}
           />
         ) : (
-          <img
-            src={camera.streamUrl}
-            alt={`Webcam ${index}`}
-            style={{ width: "100%", height: "auto" }}
-          />
+          <img src={camera.streamUrl} alt="Camera feed" style={{ width: "100%", height: "auto" }} />
         )}
       </Grid>
     );
@@ -56,24 +73,25 @@ function CCTVGrid({ cameras, onError, onStopStreaming, onRemoveCamera }) {
         )}
       </Grid>
       {cameras.length > 0 && (
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleStopStreaming}
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            backgroundColor: "#d32f2f",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#c62828",
-            },
-          }}
-        >
-          Stop All Camera Feeds
-        </Button>
+        <Box display="flex" justifyContent="flex-start" mt={2}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleStopStreaming}
+            startIcon={<CloseIcon />}
+            sx={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              backgroundColor: "#d32f2f",
+              "&:hover": {
+                backgroundColor: "#c62828",
+              },
+            }}
+          >
+            Stop All Camera Feeds
+          </Button>
+        </Box>
       )}
     </>
   );
@@ -82,6 +100,7 @@ function CCTVGrid({ cameras, onError, onStopStreaming, onRemoveCamera }) {
 CCTVGrid.propTypes = {
   cameras: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       streamUrl: PropTypes.string.isRequired,
     })

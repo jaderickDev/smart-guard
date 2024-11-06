@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {           
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'litter_detection',         
+        'NAME': 'smart_guard',         
         'USER': 'root',        
         'PASSWORD': 'Jade@gen1310', 
         'HOST': 'localhost',                  
