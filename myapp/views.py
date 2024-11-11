@@ -18,16 +18,31 @@ import math
 from datetime import datetime, timedelta
 import os
 from openpyxl import load_workbook
+from django.conf import settings
+from django.conf.urls.static import static
+from django.http import JsonResponse
 
 print("Loading views.py")  # Add this line
 
 # Constants and initializations
 LOCATION_NAME = "Los Banos, Philippines"
-filepathexcel = "C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/litter.detect.v91.yolov8/Book1.xlsx"
+filepathexcel = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/litter.detect.v91.yolov8/Book1.xlsx"
 wb = load_workbook(filepathexcel)
-output_directory = "C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/frames"
-os.makedirs(output_directory, exist_ok=True)
-model = YOLO("C:/Users/allen/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
+OUTPUT_DIR_URL = '/output_directory/'
+OUTPUT_DIR_PATH = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/frames"
+os.makedirs(OUTPUT_DIR_PATH, exist_ok=True)
+model = YOLO("C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
+
+def list_output_files(request):
+    output_files = []
+    output_dir = settings.OUTPUT_DIR_PATH
+
+    if os.path.exists(output_dir):
+        for filename in os.listdir(output_dir):
+            file_url = f"{settings.OUTPUT_DIR_URL}{filename}"
+            output_files.append({"filename": filename, "file_url": file_url})
+
+    return JsonResponse({"output_files": output_files})
 
 y = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240]
 x1 = [245, 215, 200, 180, 160, 145, 138, 122, 114, 110, 98, 80]
@@ -126,7 +141,7 @@ def generate_frames():
 
                     if distance >= 39 and current_time - last_detection_time >= detection_interval:
                         resized_frame = cv2.resize(frame, desired_frame_size)
-                        frame_path = os.path.join(output_directory, f"frame_{frame_count:04d}.jpg")
+                        frame_path = os.path.join(OUTPUT_DIR_PATH, f"frame_{frame_count:04d}.jpg")
                         cv2.imwrite(frame_path, resized_frame)
                         
                         # Create TrashAlert
@@ -248,6 +263,7 @@ def get_alerts(request):
     alerts = TrashAlert.objects.all().order_by('-detected_at')[:5]
     alert_list = [
         {
+            'id': alert.id,
             'detected_at': alert.detected_at.strftime('%Y-%m-%d %H:%M:%S'),
             'location': alert.location
         }
@@ -257,8 +273,11 @@ def get_alerts(request):
 
 def alert_detail(request, alert_id):
     alert = get_object_or_404(TrashAlert, id=alert_id)
-    return render(request, 'alert_detail.html', {'alert': alert})
-
+    alert_data = {
+        'detected_at': alert.detected_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'location': alert.location
+    }
+    return JsonResponse({'alert': alert_data})
 @csrf_exempt
 def handle_preflight(request):
     response = HttpResponse()

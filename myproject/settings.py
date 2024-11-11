@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {           
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'smart_guard',         
+        'NAME': 'litter_detection',         
         'USER': 'root',        
         'PASSWORD': 'Jade@gen1310', 
         'HOST': 'localhost',                  
@@ -138,4 +138,10 @@ os.path.join(BASE_DIR, 'material-dashboard-react-main/build/static'),
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Define the output directory path
+OUTPUT_DIR_PATH = os.path.join(BASE_DIR, 'media/output/')  # Adjust as necessary
+
+# Define the output directory URL
+OUTPUT_DIR_URL = '/media/output/'  # Adjust as necessary
 

@@ -37,7 +37,7 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import CCTV from "layouts/dashboard";
-import Tables from "layouts/tables";
+import FileManagement from "layouts/file_management";
 import Billing from "layouts/billing";
 import Notifications from "layouts/notifications";
 
@@ -64,10 +64,10 @@ const routes = [
   {
     type: "collapse",
     name: "File Management",
-    key: "tables",
+    key: "file_management",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/tables",
-    component: <Tables />,
+    component: <FileManagement />,
   },
   {
     type: "collapse",

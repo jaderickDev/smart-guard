@@ -21,7 +21,8 @@ const CameraSelection = ({ onCameraSelect }) => {
       alert("Please enter a valid IP address");
       return;
     }
-    onCameraSelect(cameraType, ipAddress);
+    const streamUrl = cameraType === "ip" ? `http://${ipAddress}/video` : null;
+    onCameraSelect(cameraType, streamUrl);
   };
 
   return (

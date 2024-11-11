@@ -21,41 +21,33 @@ function CCTV() {
     setIsStreaming(true);
   };
 
-  const stopStreaming = () => {
-    setCameras([]);
-    setIsStreaming(false);
-  };
-
-  const removeCamera = (index) => {
-    setCameras((prevCameras) => prevCameras.filter((_, i) => i !== index));
-    if (cameras.length === 1) {
-      setIsStreaming(false);
-    }
-  };
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3} borderRadius="4px">
         <MDBox borderRadius="4px">
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={2.5}>
               <CameraSelection onCameraSelect={handleCameraSelect} />
-              {isStreaming && (
-                <CCTVGrid
-                  cameras={cameras}
-                  defaultImageSrc={defaultImageSrc}
-                  onError={(error) => {
-                    console.error("CCTV Stream Error:", error);
-                  }}
-                  onStopStreaming={stopStreaming}
-                  onRemoveCamera={removeCamera}
-                />
-              )}
             </Grid>
           </Grid>
         </MDBox>
       </MDBox>
+      {isStreaming && (
+        <MDBox>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <CCTVGrid
+                cameras={cameras}
+                defaultImageSrc={defaultImageSrc}
+                onError={(error) => {
+                  console.error("CCTV Stream Error:", error);
+                }}
+              />
+            </Grid>
+          </Grid>
+        </MDBox>
+      )}
     </DashboardLayout>
   );
 }
