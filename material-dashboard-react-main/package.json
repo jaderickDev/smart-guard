@@ -1,7 +1,7 @@
 {
   "name": "material-dashboard-2-react",
   "version": "2.2.0",
-  "proxy": "http://localhost:8000",
+  "proxy": "http://127.0.0.1:8000",
   "private": true,
   "author": "Creative Tim",
   "license": "See license in https://www.creative-tim.com/license",

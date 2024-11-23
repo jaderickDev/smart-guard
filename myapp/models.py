@@ -23,3 +23,21 @@ class CustomUser(AbstractUser):
         related_name='customuser_set',  # Change this to a unique name
         blank=True,
     )
+
+class AdminSmart(models.Model):
+    # Define your model fields here, for example:
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    # ... other fields ...
+
+    def __str__(self):
+        return self.name
+
+class UserSmart(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name

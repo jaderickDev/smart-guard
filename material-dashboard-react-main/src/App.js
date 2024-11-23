@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect, useMemo } from "react";
 // react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -52,6 +37,8 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 
+import LoginPage from "layouts/authentication/LoginSignup/LoginSignup";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -68,6 +55,14 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const [showLogin, setShowLogin] = useState(false);
+
+  // Add a new state to manage login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to handle successful login
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
 
   // Cache for the rtl
   useMemo(() => {
@@ -116,7 +111,14 @@ export default function App() {
       }
 
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return (
+          <Route
+            exact
+            path={route.route}
+            element={isLoggedIn ? route.component : <Navigate to="/login" />}
+            key={route.key}
+          />
+        );
       }
 
       return null;
@@ -146,62 +148,70 @@ export default function App() {
     </MDBox>
   );
 
-  return direction === "rtl" ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
-        <CssBaseline />) : (
-        <>
-          {layout === "dashboard" && (
-            <>
-              <Sidenav
-                color={sidenavColor}
-                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-                brandName="Smart Guard"
-                routes={routes}
-                onMouseEnter={handleOnMouseEnter}
-                onMouseLeave={handleOnMouseLeave}
-              />
-              <Configurator />
-              {configsButton}
-            </>
-          )}
-          {layout === "vr" && <Configurator />}
-          <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </>
-        )
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={darkMode ? themeDark : theme}>
-      <CssBaseline />
-      {showLogin ? (
-        <div></div>
-      ) : (
-        <>
-          {layout === "dashboard" && (
-            <>
-              <Sidenav
-                color={sidenavColor}
-                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-                brandName="Smart Guard Dashboard"
-                routes={routes}
-                onMouseEnter={handleOnMouseEnter}
-                onMouseLeave={handleOnMouseLeave}
-              />
-              <Configurator />
-              {configsButton}
-            </>
-          )}
-          {layout === "vr" && <Configurator />}
-          <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </>
-      )}
-    </ThemeProvider>
+  return (
+    <>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <LoginPage onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+
+        <Route
+          path="/*"
+          element={
+            isLoggedIn ? (
+              <ThemeProvider theme={darkMode ? themeDark : theme}>
+                <CssBaseline />
+                {layout === "dashboard" && (
+                  <>
+                    <Sidenav
+                      color={sidenavColor}
+                      brand={
+                        (transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite
+                      }
+                      brandName="Smart Guard Dashboard"
+                      routes={routes}
+                      onMouseEnter={handleOnMouseEnter}
+                      onMouseLeave={handleOnMouseLeave}
+                    />
+                    <Configurator />
+                    {configsButton}
+                  </>
+                )}
+                <MDBox
+                  sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
+                    p: 3,
+                    position: "relative",
+                    [breakpoints.up("xl")]: {
+                      marginLeft: miniSidenav ? pxToRem(120) : pxToRem(274),
+                      transition: transitions.create(["margin-left", "margin-right"], {
+                        easing: transitions.easing.easeInOut,
+                        duration: transitions.duration.standard,
+                      }),
+                    },
+                  })}
+                >
+                  <Routes>
+                    {getRoutes(routes)}
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
+                  </Routes>
+                </MDBox>
+              </ThemeProvider>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />} />
+      </Routes>
+    </>
   );
 }

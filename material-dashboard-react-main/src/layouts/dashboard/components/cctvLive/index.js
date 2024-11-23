@@ -46,7 +46,11 @@ function CCTVGrid({ cameras, onError }) {
             }}
           />
         ) : (
-          <img src={camera.streamUrl} alt="marie.jpg" style={{ width: "100%", height: "auto" }} />
+          <img
+            src={camera.streamUrl}
+            alt="No Camera Display"
+            style={{ width: "100%", height: "auto" }}
+          />
         )}
       </Grid>
     );

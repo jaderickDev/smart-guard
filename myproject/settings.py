@@ -25,13 +25,18 @@ SECRET_KEY = 'django-insecure-77fmj)9ig$k_mt+oyr+nzlm#(bwl0956)0=8izh@^v_f#qro+y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'http://localhost:3000',
+    '127.0.0.1',
+    'localhost',
+]
 
-
+CSRF_ALLOWED_ORIGINS = ['http://localhost:3000']
+CORS_ORIGINS_WHITELIST = ["http://localhost :3000"]
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'corsheaders',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -39,22 +44,28 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'myapp',
-    'corsheaders',
     'accounts',
 ]
 
 MIDDLEWARE = [
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development only. Use specific origins in production.
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -137,11 +148,41 @@ os.path.join(BASE_DIR, 'material-dashboard-react-main/build/static'),
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ 
+CORS_ALLOWS_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Define the output directory path
-OUTPUT_DIR_PATH = os.path.join(BASE_DIR, 'media/output/')  # Adjust as necessary
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']  # Add your frontend domain
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_NAME = 'csrftoken'
 
-# Define the output directory URL
-OUTPUT_DIR_URL = '/media/output/'  # Adjust as necessary
+# If you're using different domains for frontend and backend, also set:
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',  # Add your frontend domain
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+MEDIA_URL = '/alert/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'alert')
 

@@ -15,7 +15,7 @@ import MDSnackbar from "components/MDSnackbar";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import TrashNotification from "./component/notif";
+import Notif from "./component/notif";
 
 function Notifications() {
   return (
@@ -26,7 +26,7 @@ function Notifications() {
           <Grid item xs={12} sx={{ height: "100%" }}>
             <Card sx={{ height: "100%" }}>
               <MDBox sx={{ height: "100%", overflow: "auto" }}>
-                <TrashNotification />
+                <Notif />
               </MDBox>
             </Card>
           </Grid>

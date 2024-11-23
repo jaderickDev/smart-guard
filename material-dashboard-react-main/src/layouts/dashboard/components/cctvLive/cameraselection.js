@@ -18,6 +18,8 @@ import LanguageIcon from "@mui/icons-material/Language";
 function CameraSelection({ onCameraSelect }) {
   const [cameraType, setCameraType] = useState("");
   const [ipAddress, setIpAddress] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +68,28 @@ function CameraSelection({ onCameraSelect }) {
               label="IP Address"
               value={ipAddress}
               onChange={(e) => setIpAddress(e.target.value)}
+              required
+              variant="outlined"
+            />
+          )}
+          {cameraType === "ip" && (
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              variant="outlined"
+            />
+          )}
+          {cameraType === "ip" && (
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               variant="outlined"
             />

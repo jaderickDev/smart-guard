@@ -9,7 +9,7 @@ from django.utils.timezone import localtime
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import time  # Add this import
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 import numpy as np
@@ -21,16 +21,21 @@ from openpyxl import load_workbook
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+import logging
+from django.utils.decorators import method_decorator
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 print("Loading views.py")  # Add this line
 
 # Constants and initializations
-LOCATION_NAME = "Los Banos, Philippines"
+LOCATION_NAME = "LSPU, Los Banos, Laguna, Philippines"
 filepathexcel = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/litter.detect.v91.yolov8/Book1.xlsx"
 wb = load_workbook(filepathexcel)
-OUTPUT_DIR_URL = '/output_directory/'
-OUTPUT_DIR_PATH = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/frames"
-os.makedirs(OUTPUT_DIR_PATH, exist_ok=True)
+output_directory = "C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/frames"
+os.makedirs(output_directory, exist_ok=True)
 model = YOLO("C:/Users/Jaderick/Desktop/detectionalgo/runs/detect/train2/weights/18k_openvino_model/18k.pt")
 
 def list_output_files(request):
@@ -66,7 +71,7 @@ stream_active = True
 
 def generate_frames():
     global stream_active
-    cap = cv2.VideoCapture(0)  # Use 0 for webcam, or RTSP URL for IP camera
+    cap = cv2.VideoCapture("rtsp://admin:abc12345@192.168.100.43")
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)  # Set a small buffer size
 
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -141,7 +146,7 @@ def generate_frames():
 
                     if distance >= 39 and current_time - last_detection_time >= detection_interval:
                         resized_frame = cv2.resize(frame, desired_frame_size)
-                        frame_path = os.path.join(OUTPUT_DIR_PATH, f"frame_{frame_count:04d}.jpg")
+                        frame_path = os.path.join(output_directory, f"frame_{frame_count:04d}.jpg")
                         cv2.imwrite(frame_path, resized_frame)
                         
                         # Create TrashAlert
@@ -251,7 +256,7 @@ def index(request):
     })
 
 from django.http import StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 @csrf_exempt
@@ -274,10 +279,23 @@ def get_alerts(request):
 def alert_detail(request, alert_id):
     alert = get_object_or_404(TrashAlert, id=alert_id)
     alert_data = {
+        'id': alert.id,
         'detected_at': alert.detected_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'location': alert.location
+        'location': alert.location,
+        'frame_image': request.build_absolute_uri(alert.frame_image.url) if alert.frame_image else None
     }
     return JsonResponse({'alert': alert_data})
+@csrf_exempt
+@ensure_csrf_cookie
+def delete_alert(request, alert_id):
+    if request.method == "DELETE":
+        try:
+            alert = get_object_or_404(TrashAlert, id=alert_id)
+            alert.delete()
+            return JsonResponse({'message': 'Alert deleted successfully'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
 @csrf_exempt
 def handle_preflight(request):
     response = HttpResponse()
@@ -293,3 +311,20 @@ def stop_streaming(request):
         stream_active = False
         return JsonResponse({'status': 'success', 'message': 'Streaming stopped'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+# If you're using class-based views:
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class AlertViewSet(viewsets.ModelViewSet):
+    queryset = TrashAlert.objects.all()
+    # Add your serializer here if you have one
+    # serializer_class = AlertSerializer
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# If you're using function-based views:
+@ensure_csrf_cookie
+def your_view_function(request):
+    # your existing view code...
+    pass

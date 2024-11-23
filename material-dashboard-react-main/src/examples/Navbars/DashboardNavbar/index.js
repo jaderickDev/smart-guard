@@ -24,8 +24,7 @@ import PropTypes from "prop-types";
 // @material-ui core components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
@@ -69,6 +68,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   };
   const currentRoute = route[0]; // This assumes that your route structure is like "/dashboard", "/profile", etc.
   const customTitle = titleMap[currentRoute] || route[route.length - 1];
+  const [anchorEl, setAnchorEl] = useState(null);
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {
@@ -99,6 +99,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+  const handleLogout = () => {
+    // Implement your logout logic here
+    console.log("Logout");
+    // Example: Clear local storage or context, then redirect to login
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "/login"; // Redirect to login page
+    handleCloseMenu();
+  };
 
   // Render the notifications menu
   const renderMenu = () => (
@@ -113,12 +121,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
-      <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
-      <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
+      <MenuItem onClick={handleLogout}>
+        <Icon sx={{ mr: 1 }}>logout</Icon>
+        Logout
+      </MenuItem>
     </Menu>
   );
-
   // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -145,22 +153,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
-                <IconButton sx={navbarIconButton} size="small" disableRipple>
-                  <Icon sx={iconsStyle}>account_circle</Icon>
-                </IconButton>
-              </Link>
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarMobileMenu}
-                onClick={handleMiniSidenav}
-              >
-                <Icon sx={iconsStyle} fontSize="medium">
-                  {miniSidenav ? "menu_open" : "menu"}
-                </Icon>
+              <IconButton sx={navbarIconButton} size="small" disableRipple onClick={handleOpenMenu}>
+                <Icon sx={iconsStyle}>account_circle</Icon>
               </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
               <IconButton
                 size="small"
                 disableRipple

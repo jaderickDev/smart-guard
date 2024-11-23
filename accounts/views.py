@@ -1,77 +1,130 @@
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from rest_framework import status
-from .serializers import UserSerializer
-from django.contrib.auth import get_user_model
-from django.views import View
-from rest_framework import viewsets
-from django.contrib.auth.decorators import login_required
-from django.views.generic.list import ListView
-from django.utils.decorators import method_decorator
-User = get_user_model()
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import AdminSmart, UserSmart
+from django.contrib.auth.hashers import check_password, make_password
 
-# Create your views here.
-
-@csrf_exempt
-def register(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('name')
-        password = data.get('password')
-
-        try:
-            user = User.objects.create_user(username=username, password=password)
-            return JsonResponse({'message': 'User created successfully!'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-@csrf_exempt
-def login_view(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
-
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({'token': 'your_token_here'}, status=200)  # Replace with actual token logic
-        else:
-            return JsonResponse({'error': 'Invalid credentials'}, status=401)
-
-@method_decorator(login_required, name='dispatch')
-class RegisterListView(ListView):
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            username = data.get('name')
-            password = data.get('password')
-
-            if User.objects.filter(username=username).exists():
-                return JsonResponse({'error': 'Username already exists'}, status=400)
-
-            user = User(username=username)
-            user.set_password(password)  # Hash the password
-            user.save()
-
-            return JsonResponse({'message': 'User created successfully'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-class LoginView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
+@api_view(['POST'])
+def user_register (request):
+    try:
         username = request.data.get('username')
         password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not username or not password:
+            return Response(
+                {'error': 'Please provide both username and password'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if UserSmart.objects.filter(username=username).exists():
+            return Response(
+                {'error': 'Username already exists'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user = UserSmart.objects.create(
+            username=username,
+            password=make_password(password)
+        )
+        
+        return Response({
+            'message': 'Registration successful',
+            'user_id': user.id,
+            'username': user.username
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        print(f"Registration error: {str(e)}")  # For debugging
+        return Response(
+            {'error': 'An error occurred during registration'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def user_login(request):
+    try:
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response(
+                {'error': 'Please provide both username and password'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = UserSmart.objects.get(username=username)
+        except UserSmart.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if check_password(password, user.password):
+            return Response({
+                'message': 'Login successful',
+                'user_id': user.id,
+                'username': user.username
+            })
+        
+        return Response(
+            {'error': 'Invalid password'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    except Exception as e:
+        print(f"Login error: {str(e)}")  # For debugging
+        return Response(
+            {'error': 'An error occurred during login'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def admin_login(request):
+    try:
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response(
+                {'error': 'Please provide both username and password'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            admin = AdminSmart.objects.get(username=username)
+        except AdminSmart.DoesNotExist:
+            return Response(
+                {'error': 'Admin not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # For the default admin with non-hashed password
+        if admin.username == 'admin' and password == 'admin':
+            admin.password = make_password('admin')
+            admin.save()
+            return Response({
+                'message': 'Admin login successful',
+                'admin_id': admin.id,
+                'username': admin.username
+            })
+        
+        # For regular login with hashed password
+        if check_password(password, admin.password):
+            return Response({
+                'message': 'Admin login successful',
+                'admin_id': admin.id,
+                'username': admin.username
+            })
+        
+        return Response(
+            {'error': 'Invalid password'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    except Exception as e:
+        print(f"Login error: {str(e)}")  # For debugging
+        return Response(
+            {'error': 'An error occurred during login'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

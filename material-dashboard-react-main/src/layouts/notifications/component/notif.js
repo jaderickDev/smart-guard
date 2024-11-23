@@ -1,48 +1,41 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const AlertDetails = ({ alertId }) => {
-  const [alert, setAlert] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Fetch alert data from Django API
-    fetch(`/api/alerts/${alertId}/`)
-      .then((response) => response.json())
-      .then((data) => setAlert(data))
-      .catch((error) => console.error("Error fetching alert:", error));
-  }, [alertId]);
-
-  const handleBack = () => {
-    navigate("/");
+const Notif = () => {
+  const [alerts, setAlerts] = useState([]);
+  const fetchAlerts = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/alerts/"); // Update the URL as needed
+      setAlerts(response.data.alerts);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+    }
   };
 
-  if (!alert) {
-    return <p>Loading alert details...</p>;
-  }
+  useEffect(() => {
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 5000); // Fetch alerts every 5 seconds
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
 
   return (
-    <div className="col-md-6">
-      <div className="details" style={{ marginTop: "40px" }}>
-        <h5 className="card-title">Camera Location: {{ alert, location }}</h5>
-        <p className="card-text">
-          <strong>Detected At:</strong> {{ alert, detected_at }}
-        </p>
-        <button onClick={handleBack} className="btn btn-success mt-3">
-          Back to Dashboard
-        </button>
-      </div>
+    <div>
+      <h3>Recent Activities</h3>
+      <ul>
+        {alerts.length > 0 ? (
+          alerts.map((alert) => (
+            <li key={alert.id}>
+              <p>
+                Detected at: {alert.detected_at} in {alert.location}
+              </p>
+            </li>
+          ))
+        ) : (
+          <li>No alerts yet.</li>
+        )}
+      </ul>
     </div>
   );
 };
 
-AlertDetails.propTypes = {
-  alertId: PropTypes.string,
-};
-
-AlertDetails.defaultProps = {
-  alertId: null,
-};
-
-export default AlertDetails;
+export default Notif;
